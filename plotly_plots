@@ -1,0 +1,29 @@
+#Plots
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from plotly.offline import init_notebook_mode, iplot
+import plotly.figure_factory as ff
+import cufflinks
+cufflinks.go_offline()
+cufflinks.set_config_file(world_readable=True, theme='pearl')
+import plotly.graph_objs as go
+init_notebook_mode(connected=True)
+pd.set_option('display.max_columns', 100)
+
+
+
+# Histogram
+def histogram_plot(dataframe,feature):
+    
+    return dataframe[feature].iplot(
+    kind='hist',
+    bins=100,
+    xTitle='feature',
+    linecolor='black',
+    yTitle='count',
+    title='Histogram of '+feature)
+#Box plots
+def box_plot(dataframe,feature):
+    return dataframe[feature].iplot(kind='box', title='Box plot of '+feature)
