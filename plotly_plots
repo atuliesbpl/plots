@@ -27,3 +27,40 @@ def histogram_plot(dataframe,feature):
 #Box plots
 def box_plot(dataframe,feature):
     return dataframe[feature].iplot(kind='box', title='Box plot of '+feature)
+    
+    
+#pie chart
+def plot_piechart(df,feature,title):
+    """
+    Pie chart plot
+    Parameters
+    ------
+    df: pd.DataFrame
+        dataframe
+    feature: str
+        name of the feature
+    title: str
+        title of the pie chart
+    ------
+    plotly image: plotly image
+        plotly image
+    """
+    import plotly.graph_objs as go
+    import plotly.offline as py
+    trace = go.Pie(labels = df[feature].value_counts().keys().tolist(),
+               values = df[feature].value_counts().values.tolist(),
+               marker = dict(colors = ['royalblue','lime'],
+                             line = dict(color = "white", width =  1.3)
+                            ),
+               rotation = 90,
+               hoverinfo = "label+value+text",
+               hole = .5
+              )
+    layout = go.Layout(dict(title = title,
+                            plot_bgcolor = "rgb(243,243,243)",
+                            paper_bgcolor = "rgb(243,243,243)",
+                           )
+                      )
+    data = [trace]
+    fig = go.Figure(data = data, layout = layout)
+    return py.iplot(fig)
