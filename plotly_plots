@@ -64,3 +64,32 @@ def plot_piechart(df,feature,title):
     data = [trace]
     fig = go.Figure(data = data, layout = layout)
     return py.iplot(fig)
+    
+    
+# Wordcloud
+def plot_wordcloud(df,feature):
+    """
+    Word cloud plot
+    Parameters
+    ------
+    df: pd.DataFrame
+        dataframe
+    feature: str
+        feature
+    Returns
+    ------
+    plt: matplotlib image
+        matplotlib image
+    """
+    import matplotlib.pyplot as plt
+    from wordcloud import WordCloud
+    plt.subplots(figsize = (20,10))
+    wordcloud = WordCloud (
+                        background_color = 'white',
+                        width = 512,
+                        height = 384
+                            ).generate(' '.join(df[feature]))
+    plt.imshow(wordcloud) # image show
+    plt.axis('off') # to off the axis of x and y
+    plt.savefig('Plotly-World_Cloud.png')
+    return plt.show()
