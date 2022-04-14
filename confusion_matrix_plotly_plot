@@ -1,0 +1,111 @@
+#Setting up folder
+file_path, file_name = os.path.split(file) 
+project_path = file_path +'\\'+ file_name.split('.')[0]
+if not os.path.exists(project_path):
+    os.makedirs(project_path)
+    print ("Folder is created with a name : "+project_path)
+else:
+    print ("Folder already exists with a name : "+project_path)
+
+
+
+
+
+#Confusion matrix plot
+def plot_confusion_matrix(y_true, y_pred,
+                          list_of_class_names, multiclass,
+                          output_type='json'):
+    """
+    performs confusion matrix plot
+    Parameters
+    ------
+    y_test: pd.Series
+         Y_test 
+    y_pred: pd.Series
+         Y_pred 
+    list_of_class_names: list
+        list of class names in target variable
+    multilabel: bool
+        True/False
+    Returns
+    ------
+    graph_data: dict
+        json object
+    status: str
+        success
+    Exceptions
+    ------
+    graph_data: str
+        There is an error while generating graph
+    status: str
+        failed
+    """
+    # """
+    # This function prints and plots the confusion matrix.
+    # Normalization can be applied by setting `normalize=True`.
+    # """
+
+    try:
+        if hasattr(y_true, 'to_pandas'):
+            y_true = y_true.to_pandas()
+        if hasattr(y_pred, 'to_pandas'):
+            y_pred = y_pred.to_pandas()
+
+        print('y_true {}'.format(y_true))
+        print('Y_pred {}'.format(y_pred))
+
+        class_names = sorted(list_of_class_names)
+        from sklearn.metrics import confusion_matrix
+        if not multiclass:
+            np.set_printoptions(precision=2)
+            cm = confusion_matrix(y_true, y_pred)
+            z = cm.tolist()
+            length = len(z)
+
+        else:  # If multilabel
+            if isinstance(y_true, np.ndarray):
+                y_true = pd.DataFrame(y_true, columns=class_names)
+            if isinstance(y_pred, np.ndarray):
+                y_pred = pd.DataFrame(y_pred, columns=class_names)
+            cm = confusion_matrix(y_true.idxmax(axis=1),
+                                  y_pred.idxmax(axis=1))
+            z = cm.tolist()
+            length = len(z)
+
+#         if self.foreground == '#08509d':
+#             colorscale = [[0, '#F0F0F0'], [1, '#08509d']]
+
+#         else:
+#             # colorscale = [[0, '#FFFFFF'], [1, '#be7024']]
+        colorscale = [[0, '#f5dbc1'], [1, '#be7024']]
+
+        label = (list(map(str, class_names[:length])))
+
+        fig = ff.create_annotated_heatmap(z, x=label,
+                                          y=label,
+                                          colorscale=colorscale,
+                                          showscale=True)
+        fig.layout.update(
+            dict(
+                xaxis=dict(title='Predicted labels', type='category'),
+                yaxis=dict(title='Actual labels', type='category'),
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)'
+            )
+        )
+
+        if output_type == 'image':
+            # !conda install -c plotly plotly-orca
+            png = plotly.io.to_image(fig)
+            graph_data = base64.b64encode(png).decode('ascii')
+        else:
+            graph_data = json.loads(fig.to_json())
+            fig.write_html(os.path.join(project_path,'confusion_matrix.html'))
+        status = 'success'
+
+    except Exception as e:
+        graph_data = str(e)
+        status = 'failed'
+        print('error at generating confusion matrix.'.format(e))
+        
+    return graph_data, status
