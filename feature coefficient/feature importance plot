@@ -1,0 +1,42 @@
+def plot_feature_details(algorithm, features):
+    """
+    Feature Coefficient / Feature Importance plot 
+    Parameters
+    ------
+    algorithm: model build
+        Algorithm
+    features: list
+        list of features used in model building
+    ------
+    plotly image: plotly image
+        plotly image
+    """
+    import pandas as pd
+    import plotly.graph_objs as go
+    import plotly.offline as py
+    algorithm_name = type(algorithm).__name__
+    if hasattr(algorithm,'coef_') or hasattr(algorithm,'feature_importances_'):
+        if hasattr(algorithm,'coef_'):
+            coefficients = pd.DataFrame(algorithm.coef_.ravel())
+            title = 'Feature Coefficient Plot for '+algorithm_name
+        else:
+            coefficients = pd.DataFrame(algorithm.feature_importances_)
+            title = 'Feature Importance Plot for '+algorithm_name
+        column_df = pd.DataFrame(features)
+        coef_summary = (pd.merge(coefficients, column_df, left_index=True, 
+                               right_index=True, how="left"))
+        coef_summary.columns = ["coefficients", "features"]
+        coef_summary = coef_summary.sort_values(by = "coefficients", ascending=False)
+        trace = go.Bar(x = coef_summary["features"], y = coef_summary["coefficients"], 
+                            name = "coefficients",
+                            marker = dict(color = coef_summary["coefficients"],
+                                          colorscale = "Picnic",
+                                          line = dict(width = .6, color = "black")))
+        layout = go.Layout(dict(title = title,
+                                plot_bgcolor = "rgb(243,243,243)",
+                                paper_bgcolor = "rgb(243,243,243)"))
+        data = [trace]
+        fig = go.Figure(data = data, layout = layout)
+        return py.iplot(fig)
+    else:
+        return 'Algorithm doesnot support feature coefficient/feature importance.' 
