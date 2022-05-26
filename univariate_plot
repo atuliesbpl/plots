@@ -1,0 +1,40 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt 
+
+def univariate(df,col,vartype,hue =None):    
+    '''
+    Univariate function will plot parameter values in graphs.
+    df      : dataframe name
+    col     : Column name
+    vartype : variable type : continuous or categorical
+                Continuous(0)   : Distribution, Violin & Boxplot will be plotted.
+                Categorical(1) : Countplot will be plotted.
+    hue     : Only applicable in categorical analysis.
+    '''
+    sns.set(style="darkgrid")
+    if vartype == 0:
+        fig, ax=plt.subplots(nrows =1,ncols=3,figsize=(20,8))
+        ax[0].set_title("Distribution Plot")
+        sns.distplot(df[col],ax=ax[0])
+        ax[1].set_title("Violin Plot")
+        sns.violinplot(data =df, x=col,ax=ax[1], inner="quartile")
+        ax[2].set_title("Box Plot")
+        sns.boxplot(data =df, x=col,ax=ax[2],orient='v')
+    if vartype == 1:
+        temp = pd.Series(data = hue)
+        fig, ax = plt.subplots()
+        width = len(df[col].unique()) + 6 + 4*len(temp.unique())
+        fig.set_size_inches(width , 7)
+        ax = sns.countplot(data = df, x= col, order=df[col].value_counts().index,hue = hue) 
+        if len(temp.unique()) > 0:
+            for p in ax.patches:
+                ax.annotate('{:1.1f}%'.format((p.get_height()*100)/float(len(loan))), (p.get_x()+0.05, p.get_height()+20))  
+        else:
+            for p in ax.patches:
+                ax.annotate(p.get_height(), (p.get_x()+0.32, p.get_height()+20)) 
+        del temp
+    else:
+        exit
+    plt.show()
