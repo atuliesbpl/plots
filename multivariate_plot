@@ -1,0 +1,49 @@
+def multivariate_plot(dataframe, variable1, variable2, variable3, to_html=True):
+        import plotly.graph_objs as go
+        import pandas as pd
+        """
+        performs scatter plot graph display for 3 features
+        Parameters
+        ------
+        dataframe: pd.DataFrame
+            input data frame
+        variable1: str
+            variables from the data frame for 1
+        variable2: str
+            variables from the data frame for 2
+        variable3: str
+            variables from the data frame for 3
+        to_html: bool
+            True/False for saving html file to local system or to display
+        Returns
+        ------
+        graph_data: plotly image
+            plotly file
+        """
+        cat = dataframe[variable3].unique()
+        new = {}
+        for i in range(len(cat)):
+            new[cat[i]] = dataframe[dataframe[variable3] == (cat[i])]
+            
+        fig = go.Figure()
+        for k, v in new.items():
+            fig.add_trace(
+                go.Scatter(x=v[variable1],
+                           y=v[variable2],
+                           mode='markers',
+                           name=str(k),
+                           hoverinfo='all'))
+
+        fig.layout.update(
+            title='{0} VS {1} VS {2}' ''.format(variable1, variable2, variable3),
+            xaxis=dict(title=variable1,
+                       zeroline=False,
+                       showgrid=True),
+            yaxis=dict(title=variable2,
+                       zeroline=True,
+                       showgrid=True))
+        if to_html:
+            graph_data = fig.write_html('multivariate_plot.html')
+        else:
+            graph_data = fig
+        return graph_data
